@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>AI Prompt Generator Pro</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+      body {
+        font-family: 'Roboto', sans-serif;
+        background-color: #0a0a0a;
+      }
+      .font-orbitron {
+        font-family: 'Orbitron', sans-serif;
+      }
+      /* Custom scrollbar for a better look */
+      ::-webkit-scrollbar {
+        width: 8px;
+      }
+      ::-webkit-scrollbar-track {
+        background: #1a1a1a;
+      }
+      ::-webkit-scrollbar-thumb {
+        background: #4f46e5;
+        border-radius: 4px;
+      }
+      ::-webkit-scrollbar-thumb:hover {
+        background: #6366f1;
+      }
+      @keyframes fadeInOut {
+        0% { opacity: 0; transform: translate(-50%, 20px); }
+        15% { opacity: 1; transform: translate(-50%, 0); }
+        85% { opacity: 1; transform: translate(-50%, 0); }
+        100% { opacity: 0; transform: translate(-50%, 20px); }
+      }
+      .animate-fade-in-out {
+        animation: fadeInOut 3s ease-in-out forwards;
+      }
+       /* Input Decorator Styles */
+      .input-decorator {
+        position: relative;
+        display: block;
+      }
+      .input-decorator::before,
+      .input-decorator::after {
+        content: '';
+        position: absolute;
+        width: 12px;
+        height: 12px;
+        transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+        pointer-events: none;
+      }
+      .input-decorator::before {
+        top: 0;
+        left: 0;
+        border-top: 2px solid #4b5563; /* gray-600 */
+        border-left: 2px solid #4b5563; /* gray-600 */
+        border-top-left-radius: 8px; /* matches rounded-lg */
+      }
+      .input-decorator::after {
+        bottom: 0;
+        right: 0;
+        border-bottom: 2px solid #4b5563; /* gray-600 */
+        border-right: 2px solid #4b5563; /* gray-600 */
+        border-bottom-right-radius: 8px; /* matches rounded-lg */
+      }
+
+      /* Red Theme */
+      .input-decorator-red:hover::before,
+      .input-decorator-red:hover::after {
+        border-color: #f87171; /* red-400 */
+      }
+      .input-decorator-red:focus-within::before,
+      .input-decorator-red:focus-within::after {
+        border-color: #ef4444; /* red-500 */
+      }
+
+       /* Blue Theme */
+      .input-decorator-blue:hover::before,
+      .input-decorator-blue:hover::after {
+        border-color: #60a5fa; /* blue-400 */
+      }
+      .input-decorator-blue:focus-within::before,
+      .input-decorator-blue:focus-within::after {
+        border-color: #3b82f6; /* blue-500 */
+      }
+      
+      /* Purple Theme */
+      .input-decorator-purple:hover::before,
+      .input-decorator-purple:hover::after {
+        border-color: #c084fc; /* purple-400 */
+      }
+      .input-decorator-purple:focus-within::before,
+      .input-decorator-purple:focus-within::after {
+        border-color: #a855f7; /* purple-500 */
+      }
+
+      /* Green Theme */
+      .input-decorator-green:hover::before,
+      .input-decorator-green:hover::after {
+        border-color: #4ade80; /* green-400 */
+      }
+      .input-decorator-green:focus-within::before,
+      .input-decorator-green:focus-within::after {
+        border-color: #22c55e; /* green-500 */
+      }
+      
+      /* Amber Theme */
+      .input-decorator-amber:hover::before,
+      .input-decorator-amber:hover::after {
+        border-color: #fbbf24; /* amber-400 */
+      }
+      .input-decorator-amber:focus-within::before,
+      .input-decorator-amber:focus-within::after {
+        border-color: #f59e0b; /* amber-500 */
+      }
+
+      /* Welcome Screen Animations */
+      @keyframes fadeIn {
+        from { opacity: 0; }
+        to { opacity: 1; }
+      }
+      @keyframes slideUpFadeIn {
+        from { opacity: 0; transform: translateY(20px); }
+        to { opacity: 1; transform: translateY(0); }
+      }
+      @keyframes pulse-slow {
+        0%, 100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7); }
+        50% { transform: scale(1.05); box-shadow: 0 0 20px 10px rgba(239, 68, 68, 0); }
+      }
+      .animate-fade-in { animation: fadeIn 1s ease-out forwards; }
+      .animate-slide-up-fade-in { animation: slideUpFadeIn 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards; }
+      .animate-pulse-slow { animation: pulse-slow 3s infinite; }
+
+      /* Main App Transition */
+      .main-app-container {
+        opacity: 0;
+        transition: opacity 0.7s ease-in-out;
+      }
+      .main-app-container.visible {
+        opacity: 1;
+      }
+      
+      /* Watermark Background */
+      .watermark-bg {
+        background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' width='350' height='250'%3e%3ctext x='50%25' y='50%25' font-family='Orbitron, sans-serif' font-size='28' font-weight='900' fill='rgba(239, 68, 68, 0.08)' text-anchor='middle' transform='rotate(-30 175 125)'%3eLANEXA%3c/text%3e%3c/svg%3e");
+      }
+
+    </style>
+  <script type="importmap">
+{
+  "imports": {
+    "react": "https://esm.sh/react@^19.1.1",
+    "react-dom/": "https://esm.sh/react-dom@^19.1.1/",
+    "react/": "https://esm.sh/react@^19.1.1/",
+    "@google/genai": "https://esm.sh/@google/genai@^1.14.0"
+  }
+}
+</script>
+<link rel="stylesheet" href="/index.css">
+</head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/index.tsx"></script>
+  </body>
+</html>
