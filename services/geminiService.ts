@@ -1,3 +1,4 @@
+
 import { GoogleGenAI, Type, GenerateContentResponse } from "@google/genai";
 import { VeoPromptData, ImagenPromptData } from '../types';
 
@@ -231,31 +232,32 @@ export const generateStoryPrompt = async (data: VeoPromptData | ImagenPromptData
     const promptData = JSON.stringify(data, null, 2);
 
     const spokenPhrase = 'kalimatDiucapkan' in data ? data.kalimatDiucapkan : '';
-    let specialInstruction = '';
+    
+    let dialogueInstruction = `For EACH of the five scenes, you MUST include one relevant line of dialogue. This dialogue MUST be in Indonesian and enclosed in double quotes. **Crucially, you must seamlessly integrate this dialogue into the English scene description.** For example: '...he turns to his companion, urgency in his eyes, and says, "Kita harus pergi sekarang." The ground trembles beneath them.'`;
+
     if (spokenPhrase && spokenPhrase.trim() !== '') {
-        specialInstruction = `\n\n**CRITICAL INSTRUCTION:** The dialogue/spoken phrase in the JSON data ("${spokenPhrase}") MUST remain in its original Indonesian language within the English storyline. DO NOT translate this specific phrase.`;
+        dialogueInstruction += ` For Scene 3 (The Main Scene), you MUST use this exact Indonesian dialogue from the JSON data: "${spokenPhrase}". For all other scenes (1, 2, 4, 5), you must generate new, relevant Indonesian dialogue and integrate it naturally into the description.`;
+    } else {
+        dialogueInstruction += ` You must generate new, relevant Indonesian dialogue for all five scenes and integrate it naturally into each description.`;
     }
     
     const prompt = `You are an expert screenwriter and creative writer. Based on the following single scene data, expand it into a continuous five-act storyline in English. This central scene should act as the story's climax.
     
-    Your output must be structured with clear headings for each of the five scenes.
+    Your output must be structured with clear headings for the five scenes:
+    - **Scene 1: Exposition/Inciting Incident**
+    - **Scene 2: Rising Action**
+    - **Scene 3: The Main Scene (Climax)**
+    - **Scene 4: Falling Action**
+    - **Scene 5: Resolution**
 
-    **Scene 1: Exposition/Inciting Incident:** What events led up to this moment? Introduce the characters and the setting, and present the initial conflict or goal.
-
-    **Scene 2: Rising Action:** Describe the events immediately preceding the main scene. Build tension and anticipation. What obstacles did the characters face?
-
-    **Scene 3: The Main Scene (Climax):** Describe the main scene in rich, cinematic detail based on the provided JSON data. This is the turning point of the story.
-
-    **Scene 4: Falling Action:** What happens immediately after the climax? Describe the direct consequences, the emotional fallout, and the immediate next steps.
-
-    **Scene 5: Resolution:** What is the final outcome? Show the new state of affairs for the characters and their world. Provide a sense of closure.
-
-    Your response MUST be formatted exactly like this, with each scene clearly labeled with a heading and its description on a new line.
-
+    **CRITICAL INSTRUCTIONS:**
+    1.  The descriptive text for each scene must be in English.
+    2.  ${dialogueInstruction}
+    
     JSON Data for the Main Scene:
     ${promptData}
 
-    Generate the continuous five-scene story prompt in English, following the specified format precisely.${specialInstruction}`;
+    Generate the continuous five-scene story prompt, following all instructions precisely.`;
 
     const response = await ai.models.generateContent({ model: "gemini-2.5-flash", contents: prompt });
     return response.text;
